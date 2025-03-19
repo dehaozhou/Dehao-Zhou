@@ -37,6 +37,14 @@ depth_img = None
 robot = None
 first_run = True  # 新增首次运行标志
 
+def get_aligned_frame(self):
+        align = rs.align(rs.stream.color)  # type: ignore
+        frames = self.pipline.wait_for_frames()
+        # aligned_frames 对齐之后结果
+        aligned_frames = align.process(frames)
+        color = aligned_frames.get_color_frame()
+        depth = aligned_frames.get_depth_frame()
+        return color, depth
 
 def callback(color_frame, depth_frame):
     global color_img, depth_img
@@ -149,7 +157,7 @@ def displayD435():
     global first_run
     pipeline = rs.pipeline()
     config = rs.config()
-
+    time.sleep(3)
     config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
     config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
 
@@ -157,13 +165,14 @@ def displayD435():
         profile = pipeline.start(config)
         color_sensor = profile.get_device().query_sensors()[1]
         color_sensor.set_option(rs.option.enable_auto_exposure, 1)
-
+        align = rs.align(rs.stream.color)  # 对齐到彩色图像流
+    
         while True:
             frames = pipeline.wait_for_frames()
             if not frames: continue
-
-            color_frame = frames.get_color_frame()
-            depth_frame = frames.get_depth_frame()
+            aligned_frames = align.process(frames)
+            color_frame = aligned_frames.get_color_frame()
+            depth_frame = aligned_frames.get_depth_frame()
             if not color_frame or not depth_frame: continue
 
             color_image = np.asanyarray(color_frame.get_data())
