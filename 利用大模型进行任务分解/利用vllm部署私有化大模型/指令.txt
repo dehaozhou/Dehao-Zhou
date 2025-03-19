@@ -1,2 +1,8 @@
-CUDA_VISIBLE_DEVICES=1 python -m vllm.entrypoints.openai.api_server --model "/local/HXH/llm/Qwen2.5/Qwen2.5-3B-Instruct-GPTQ-Int8/" --served-model-name "Qwen3B"  --host 0.0.0.0 --port  1034 --gpu-memory-utilization 0.3
+## 创建新环境：
+conda create -n vllm python=3.10
+## 安装vllm
+pip install vllm
+
+# 利用vllm启动本地大模型
+CUDA_VISIBLE_DEVICES=1 python -m vllm.entrypoints.openai.api_server --model "/local/HXH/llm/Qwen2.5/Qwen2.5-3B-Instruct-GPTQ-Int8/" --served-model-name "Qwen3B"  --host 0.0.0.0 --port  1034     --gpu-memory-utilization 0.6（可选）
 
